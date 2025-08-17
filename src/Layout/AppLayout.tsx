@@ -1,15 +1,24 @@
-import Stack from "@mui/material/Stack";
 import Box from "@mui/material/Box";
 import { Outlet } from "react-router-dom";
 import { AppBarHeader } from "./AppBar";
+import { Footer } from "./Footer";
+import Stack from "@mui/material/Stack";
 
 export const AppLayout = () => {
   return (
-    <Stack>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "100vh",
+        width: "100%",
+      }}
+    >
       <AppBarHeader />
-      <Box sx={{ pt: 8 }}>
+      <Stack flexGrow={1} sx={{ mt: "4rem" }}>
         <Outlet />
-      </Box>
-    </Stack>
+      </Stack>
+      <Footer />
+    </Box>
   );
 };
