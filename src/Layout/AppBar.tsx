@@ -12,7 +12,7 @@ export const AppBarHeader = () => {
       }}
       position="fixed"
     >
-      <Toolbar sx={{ minHeight: 64 }}>
+      <Toolbar sx={{ height: "4rem" }}>
         <Typography
           variant="h6"
           component={Link}

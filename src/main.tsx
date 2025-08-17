@@ -5,6 +5,7 @@ import { HomePage } from "./Pages/HomePage";
 import { BudgetSimulatorPage } from "./Pages/BudgetSimulatorPage";
 import { paths } from "./Routes/paths";
 import { AppLayout } from "./Layout/AppLayout";
+import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

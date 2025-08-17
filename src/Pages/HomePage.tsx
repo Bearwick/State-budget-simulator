@@ -1,5 +1,4 @@
 import Typography from "@mui/material/Typography";
-import "../App.css";
 import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import { paths } from "../Routes/paths";
