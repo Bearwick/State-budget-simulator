@@ -4,9 +4,12 @@ import Button from '@mui/material/Button';
 import { paths } from '../Routes/paths';
 import { Link } from 'react-router-dom';
 import { useBudgetData } from '../hooks/useBudgetData';
+import { useBudgetContext } from '../context/BudgetContext';
 
 export const HomePage = () => {
-  const { data, loading, error } = useBudgetData();
+  useBudgetData();
+  const { data, loading, error } = useBudgetContext();
+
   return (
     <Stack>
       <Typography>Regjeringens statsbudsjett</Typography>

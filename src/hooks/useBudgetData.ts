@@ -1,17 +1,15 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { fetchBudgetData } from "../API/budget";
-import type { BudgetItem } from "../Types/budget";
+import { useBudgetContext } from "../context/BudgetContext";
 
 
 export function useBudgetData() {
-  const [data, setData] = useState<BudgetItem[] | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<Error | null>(null);
 
+    const { setData, setLoading, setError} = useBudgetContext();
   useEffect(() => {
     async function loadData() {
       setLoading(true);
-      setError(null);
+      setError(false);
       try {
         const res = await fetchBudgetData();
         const labels = res.dimension.Hovedpost.category.label;
@@ -30,7 +28,5 @@ export function useBudgetData() {
       }
     }
     loadData();
-  }, []);
-
-  return { data, loading, error };
+  }, [setData, setError, setLoading]);
 }
