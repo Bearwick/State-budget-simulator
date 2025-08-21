@@ -21,7 +21,6 @@ export const HomePage = () => {
   useBudgetData();
   const { data, loading, error } = useBudgetContext();
 
-  // Group data
   let inntekter: typeof data = [];
   let utgifter: typeof data = [];
   let balanse: typeof data = [];
