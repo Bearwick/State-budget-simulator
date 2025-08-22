@@ -20,6 +20,9 @@ import { useEffect, useState } from 'react';
 export const BudgetSimulatorPage = () => {
   const { data, loading, error } = useBudgetContext();
   const [localData, setLocalData] = useState<typeof data | null>(null);
+  const [newInntekt, setNewInntekt] = useState({ label: '', value: 0 });
+  const [newUtgift, setNewUtgift] = useState({ label: '', value: 0 });
+  const [newUtgiftError, setNewUtgiftError] = useState('');
 
   useEffect(() => {
     const storedData = localStorage.getItem('budgetSimulatorData');
@@ -39,6 +42,31 @@ export const BudgetSimulatorPage = () => {
     localStorage.setItem('budgetSimulatorData', JSON.stringify(newData));
   };
 
+  const addNewInntekt = () => {
+    if (!localData || !newInntekt.label) return;
+    const newCode = `INNT.NEW_${Date.now()}`;
+    const newItem = { code: newCode, label: newInntekt.label, value: newInntekt.value };
+    const updatedData = [...localData, newItem];
+    setLocalData(updatedData);
+    localStorage.setItem('budgetSimulatorData', JSON.stringify(updatedData));
+    setNewInntekt({ label: '', value: 0 });
+  };
+
+  const addNewUtgift = () => {
+    if (!localData) return;
+    if (!newUtgift.label.trim()) {
+      setNewUtgiftError('Navn på utgift må fylles ut');
+      return;
+    }
+    const newCode = `UTG.NEW_${Date.now()}`;
+    const newItem = { code: newCode, label: newUtgift.label, value: newUtgift.value };
+    const updatedData = [...localData, newItem];
+    setLocalData(updatedData);
+    localStorage.setItem('budgetSimulatorData', JSON.stringify(updatedData));
+    setNewUtgift({ label: '', value: 0 });
+    setNewUtgiftError('');
+  };
+
   const resetToFetchedData = () => {
     if (data) {
       setLocalData(data);
@@ -52,6 +80,35 @@ export const BudgetSimulatorPage = () => {
     localData?.filter((item) => !item.code.startsWith('INNT') && !item.code.startsWith('UTG')) ||
     [];
 
+  const computeTotal = (rows: typeof data | null | undefined, totalCode: string) => {
+    if (!rows) return 0;
+    return rows
+      .filter((i) => i.code !== totalCode)
+      .reduce((sum, i) => {
+        if (i.code.startsWith('INNT.NEW_') || i.code.startsWith('UTG.NEW_')) {
+          return sum + i.value;
+        } else {
+          return sum + i.value * 1_000_000;
+        }
+      }, 0);
+  };
+
+  const totalInntekterMillioner = computeTotal(inntekter, 'INNT.IALT');
+  const totalUtgifterMillioner = computeTotal(utgifter, 'UTG.IALT');
+  const differenceMrd = (totalInntekterMillioner - totalUtgifterMillioner) / 1000;
+
+  const cMillioner = localData?.find((i) => i.code === 'OF_PETROL_FOND')?.value ?? 0;
+  const cMrd = cMillioner / 1000;
+
+  const formattedDifference = differenceMrd.toLocaleString('no-NO', {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  });
+  const formattedC = cMrd.toLocaleString('no-NO', {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  });
+
   return (
     <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', mt: 2 }}>
       <Stack spacing={2} sx={{ p: 2 }} alignItems="center">
@@ -59,7 +116,18 @@ export const BudgetSimulatorPage = () => {
           Lag ditt alternative statsbudsjett
         </Typography>
         <Typography variant="body1" align="center">
-          Her kan du endre på de inntektene og utgiftene du tenker trenger mer eller mindre penger.
+          Her kan du justere inntekter og utgifter for å se hvordan forskjellige prioriteringer
+          påvirker statsbudsjettet.
+        </Typography>
+        <Typography maxWidth={'40rem'} variant="body2" align="center" color="text.secondary">
+          NB! Totalene for A og B overstiger de faktiske tallene i statsbudsjettet sett på forrige
+          side på grunn av enkelte poster. Hvis du oppdager feil, vet hvilke poster som skal
+          eksluderes fra summeringen, eller vil hjelpe til med å forbedre simulatoren, legg til et
+          issue på{' '}
+          <a href="https://github.com/YOUR_GITHUB_REPO" target="_blank" rel="noopener noreferrer">
+            Github
+          </a>
+          .
         </Typography>
 
         {error && (
@@ -94,37 +162,62 @@ export const BudgetSimulatorPage = () => {
                               </TableCell>
                               <TableCell align="right">
                                 {isTotal ? (
-                                  <Typography
-                                    fontWeight="bold"
-                                    variant="subtitle1"
-                                    paddingRight={1.75}
-                                  >
-                                    {Math.round(
-                                      inntekter
-                                        .filter((i) => i.code !== 'INNT.IALT')
-                                        .reduce((sum, i) => sum + i.value, 0) * 1_000_000
-                                    ).toLocaleString('no-NO')}{' '}
+                                  <Typography fontWeight="bold" variant="subtitle1">
+                                    {computeTotal(inntekter, 'INNT.IALT').toLocaleString('no-NO')}{' '}
                                     kr
                                   </Typography>
                                 ) : (
-                                  <TextField
-                                    type="number"
-                                    value={Math.round(item.value * 1_000_000)}
-                                    onChange={(e) =>
-                                      handleValueChange(
-                                        item.code,
-                                        Number(e.target.value) / 1_000_000
-                                      )
-                                    }
-                                    size="small"
-                                    slotProps={{
-                                      input: {
-                                        endAdornment: (
-                                          <InputAdornment position="end">kr</InputAdornment>
-                                        ),
-                                      },
-                                    }}
-                                  />
+                                  <Stack
+                                    direction="row"
+                                    spacing={1}
+                                    alignItems="center"
+                                    justifyContent="flex-end"
+                                  >
+                                    {item.code.startsWith('INNT.NEW_') && (
+                                      <Button
+                                        variant="outlined"
+                                        color="error"
+                                        size="small"
+                                        onClick={() => {
+                                          if (!localData) return;
+                                          const updatedData = localData.filter(
+                                            (i) => i.code !== item.code
+                                          );
+                                          setLocalData(updatedData);
+                                          localStorage.setItem(
+                                            'budgetSimulatorData',
+                                            JSON.stringify(updatedData)
+                                          );
+                                        }}
+                                      >
+                                        Slett
+                                      </Button>
+                                    )}
+                                    <TextField
+                                      type="number"
+                                      value={
+                                        item.code.startsWith('INNT.NEW_')
+                                          ? item.value
+                                          : Math.round(item.value * 1_000_000)
+                                      }
+                                      onChange={(e) =>
+                                        handleValueChange(
+                                          item.code,
+                                          item.code.startsWith('INNT.NEW_')
+                                            ? Number(e.target.value)
+                                            : Number(e.target.value) / 1_000_000
+                                        )
+                                      }
+                                      size="small"
+                                      slotProps={{
+                                        input: {
+                                          endAdornment: (
+                                            <InputAdornment position="end">kr</InputAdornment>
+                                          ),
+                                        },
+                                      }}
+                                    />
+                                  </Stack>
                                 )}
                               </TableCell>
                             </TableRow>
@@ -133,6 +226,31 @@ export const BudgetSimulatorPage = () => {
                       </TableBody>
                     </Table>
                   </TableContainer>
+                  <Stack direction="row" spacing={1} mt={1}>
+                    <TextField
+                      size="small"
+                      placeholder="Ny inntekt"
+                      value={newInntekt.label}
+                      onChange={(e) => setNewInntekt({ ...newInntekt, label: e.target.value })}
+                    />
+                    <TextField
+                      size="small"
+                      type="number"
+                      placeholder="Verdi"
+                      value={newInntekt.value}
+                      onChange={(e) =>
+                        setNewInntekt({ ...newInntekt, value: Number(e.target.value) })
+                      }
+                      slotProps={{
+                        input: {
+                          endAdornment: <InputAdornment position="end">kr</InputAdornment>,
+                        },
+                      }}
+                    />
+                    <Button variant="contained" size="small" onClick={addNewInntekt}>
+                      Legg til
+                    </Button>
+                  </Stack>
                 </AccordionDetails>
               </Accordion>
             </Stack>
@@ -147,6 +265,7 @@ export const BudgetSimulatorPage = () => {
                       <TableBody>
                         {utgifter.map((item) => {
                           const isTotal = item.code === 'UTG.IALT';
+                          const isNewRow = item.code.startsWith('UTG.NEW_');
                           return (
                             <TableRow key={item.code}>
                               <TableCell>
@@ -160,37 +279,59 @@ export const BudgetSimulatorPage = () => {
                               </TableCell>
                               <TableCell align="right">
                                 {isTotal ? (
-                                  <Typography
-                                    fontWeight="bold"
-                                    variant="subtitle1"
-                                    paddingRight={1.75}
-                                  >
-                                    {Math.round(
-                                      utgifter
-                                        .filter((i) => i.code !== 'UTG.IALT')
-                                        .reduce((sum, i) => sum + i.value, 0) * 1_000_000
-                                    ).toLocaleString('no-NO')}{' '}
-                                    kr
+                                  <Typography fontWeight="bold" variant="subtitle1">
+                                    {computeTotal(utgifter, 'UTG.IALT').toLocaleString('no-NO')} kr
                                   </Typography>
                                 ) : (
-                                  <TextField
-                                    type="number"
-                                    value={Math.round(item.value * 1_000_000)}
-                                    onChange={(e) =>
-                                      handleValueChange(
-                                        item.code,
-                                        Number(e.target.value) / 1_000_000
-                                      )
-                                    }
-                                    size="small"
-                                    slotProps={{
-                                      input: {
-                                        endAdornment: (
-                                          <InputAdornment position="end">kr</InputAdornment>
-                                        ),
-                                      },
-                                    }}
-                                  />
+                                  <Stack
+                                    direction="row"
+                                    spacing={1}
+                                    alignItems="center"
+                                    justifyContent="flex-end"
+                                  >
+                                    {isNewRow && (
+                                      <Button
+                                        variant="outlined"
+                                        color="error"
+                                        size="small"
+                                        onClick={() => {
+                                          if (!localData) return;
+                                          const updatedData = localData.filter(
+                                            (i) => i.code !== item.code
+                                          );
+                                          setLocalData(updatedData);
+                                          localStorage.setItem(
+                                            'budgetSimulatorData',
+                                            JSON.stringify(updatedData)
+                                          );
+                                        }}
+                                      >
+                                        Slett
+                                      </Button>
+                                    )}
+                                    <TextField
+                                      type="number"
+                                      value={
+                                        isNewRow ? item.value : Math.round(item.value * 1_000_000)
+                                      }
+                                      onChange={(e) =>
+                                        handleValueChange(
+                                          item.code,
+                                          isNewRow
+                                            ? Number(e.target.value)
+                                            : Number(e.target.value) / 1_000_000
+                                        )
+                                      }
+                                      size="small"
+                                      slotProps={{
+                                        input: {
+                                          endAdornment: (
+                                            <InputAdornment position="end">kr</InputAdornment>
+                                          ),
+                                        },
+                                      }}
+                                    />
+                                  </Stack>
                                 )}
                               </TableCell>
                             </TableRow>
@@ -199,6 +340,33 @@ export const BudgetSimulatorPage = () => {
                       </TableBody>
                     </Table>
                   </TableContainer>
+                  <Stack direction="row" spacing={1} mt={1}>
+                    <TextField
+                      size="small"
+                      placeholder="Ny utgift"
+                      value={newUtgift.label}
+                      onChange={(e) => setNewUtgift({ ...newUtgift, label: e.target.value })}
+                      error={!!newUtgiftError}
+                      helperText={newUtgiftError}
+                    />
+                    <TextField
+                      size="small"
+                      type="number"
+                      placeholder="Verdi"
+                      value={newUtgift.value}
+                      onChange={(e) =>
+                        setNewUtgift({ ...newUtgift, value: Number(e.target.value) })
+                      }
+                      slotProps={{
+                        input: {
+                          endAdornment: <InputAdornment position="end">kr</InputAdornment>,
+                        },
+                      }}
+                    />
+                    <Button variant="contained" size="small" onClick={addNewUtgift}>
+                      Legg til
+                    </Button>
+                  </Stack>
                 </AccordionDetails>
               </Accordion>
             </Stack>
@@ -208,6 +376,15 @@ export const BudgetSimulatorPage = () => {
                   <Typography>Balanse og finansiering</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
+                  <Typography textAlign={'left'}>
+                    <strong>Merk:</strong> Differansen mellom inntekter (A) og utgifter (B) er
+                    <strong> {formattedDifference} mrd. kr</strong>, men budsjettsaldoen (C) er
+                    <strong> {formattedC} mrd. kr</strong> (uten brukerendringer).
+                  </Typography>
+                  <Typography textAlign={'left'} paddingBottom={2}>
+                    Årsaken er at enkelte poster (bl.a. petroleumsinntekter og utlån) føres
+                    særskilt, og ikke inngår i A og B.
+                  </Typography>
                   <TableContainer component={Paper}>
                     <Table size="small">
                       <TableBody>
