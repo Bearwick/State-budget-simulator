@@ -14,11 +14,9 @@ import Button from '@mui/material/Button';
 import Link from '@mui/material/Link';
 import { paths } from '../Routes/paths';
 import { Link as RouterLink } from 'react-router-dom';
-import { useBudgetData } from '../hooks/useBudgetData';
 import { useBudgetContext } from '../context/BudgetContext';
 
 export const HomePage = () => {
-  useBudgetData();
   const { data, loading, error } = useBudgetContext();
 
   let inntekter: typeof data = [];

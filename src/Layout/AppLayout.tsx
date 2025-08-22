@@ -3,7 +3,6 @@ import { Outlet } from 'react-router-dom';
 import { AppBarHeader } from './AppBar';
 import { Footer } from './Footer';
 import Stack from '@mui/material/Stack';
-import { BudgetProvider } from '../context/BudgetProvider';
 
 export const AppLayout = () => {
   return (
@@ -17,9 +16,7 @@ export const AppLayout = () => {
     >
       <AppBarHeader />
       <Stack flexGrow={1} sx={{ mt: '4rem' }}>
-        <BudgetProvider>
-          <Outlet />
-        </BudgetProvider>
+        <Outlet />
       </Stack>
       <Footer />
     </Box>
