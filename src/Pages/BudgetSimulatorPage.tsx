@@ -1,4 +1,16 @@
 import Stack from '@mui/material/Stack';
+import {
+  FacebookShareButton,
+  FacebookMessengerShareButton,
+  TwitterShareButton,
+  LinkedinShareButton,
+  EmailShareButton,
+  FacebookIcon,
+  FacebookMessengerIcon,
+  TwitterIcon,
+  LinkedinIcon,
+  EmailIcon,
+} from 'react-share';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Accordion from '@mui/material/Accordion';
@@ -450,10 +462,53 @@ export const BudgetSimulatorPage = () => {
                 </AccordionDetails>
               </Accordion>
             </Stack>
-            <Stack alignItems="center" mt={2}>
-              <Button variant="contained" color="secondary" onClick={resetToFetchedData}>
+            <Stack
+              mt={2}
+              width="100%"
+              display={'flex'}
+              flexDirection={'row'}
+              justifyContent="flex-end"
+            >
+              <Button
+                sx={{ width: '10rem' }}
+                variant="contained"
+                color="secondary"
+                onClick={resetToFetchedData}
+              >
                 Start på nytt
               </Button>
+            </Stack>
+            <Stack direction="row" spacing={2} mt={2} alignItems="center">
+              <FacebookShareButton url={window.location.href}>
+                <FacebookIcon size={32} round />
+              </FacebookShareButton>
+              <FacebookMessengerShareButton
+                url={window.location.href}
+                appId="521270401588372" //finne selv
+                title={`Se mitt alternative statsbudsjett`}
+              >
+                <FacebookMessengerIcon size={32} round />
+              </FacebookMessengerShareButton>
+              <TwitterShareButton
+                url={window.location.href}
+                title={`Se mitt alternative statsbudsjett: Inntekter: ${totalInntekterMillioner.toLocaleString('no-NO')} kr, Utgifter: ${totalUtgifterMillioner.toLocaleString('no-NO')} kr.`}
+              >
+                <TwitterIcon size={32} round />
+              </TwitterShareButton>
+              <LinkedinShareButton
+                url={window.location.href}
+                title={`Mitt alternative statsbudsjett`}
+                summary={`Inntekter: ${totalInntekterMillioner.toLocaleString('no-NO')} kr, Utgifter: ${totalUtgifterMillioner.toLocaleString('no-NO')} kr.`}
+              >
+                <LinkedinIcon size={32} round />
+              </LinkedinShareButton>
+              <EmailShareButton
+                url={window.location.href}
+                subject="Mitt alternative statsbudsjett"
+                body={`Se mitt alternative statsbudsjett: Inntekter: ${totalInntekterMillioner.toLocaleString('no-NO')} kr, Utgifter: ${totalUtgifterMillioner.toLocaleString('no-NO')} kr.`}
+              >
+                <EmailIcon size={32} round />
+              </EmailShareButton>
             </Stack>
           </>
         )}
