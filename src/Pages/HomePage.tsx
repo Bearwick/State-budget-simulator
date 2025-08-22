@@ -17,7 +17,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { useBudgetContext } from '../context/BudgetContext';
 
 export const HomePage = () => {
-  const { data, loading, error } = useBudgetContext();
+  const { data, loading, error, updated } = useBudgetContext();
 
   let inntekter: typeof data = [];
   let utgifter: typeof data = [];
@@ -29,26 +29,34 @@ export const HomePage = () => {
   }
 
   return (
-    <Stack spacing={2} sx={{ p: 2 }} alignItems="center">
-      <Typography variant="h4" gutterBottom align="center">
-        Regjeringens statsbudsjett
-      </Typography>
-      <Typography variant="body1" align="center">
-        Dette viser dagens regjeringens statsbudsjett hentet fra{' '}
-        <Link href="https://www.ssb.no/statbank/table/10487" target="_blank" rel="noopener">
-          Statistisk sentralbyrå (SSB)
-        </Link>
-        .
-      </Typography>
-
-      {error && (
-        <Typography color="error">
-          En feil har oppstått: kunne ikke hente statsbudsjettet
+    <Stack spacing={6} sx={{ p: 2 }} alignItems="center">
+      <Stack>
+        <Typography variant="h4" gutterBottom align="center">
+          Regjeringens statsbudsjett
         </Typography>
-      )}
+        <Typography variant="body1" align="center">
+          Dette viser dagens regjeringens statsbudsjett hentet fra{' '}
+          <Link href="https://www.ssb.no/statbank/table/10487" target="_blank" rel="noopener">
+            Statistisk sentralbyrå (SSB)
+          </Link>
+          .
+        </Typography>
+
+        {error && (
+          <Typography color="error">
+            En feil har oppstått: kunne ikke hente statsbudsjettet
+          </Typography>
+        )}
+      </Stack>
 
       {!loading && data && (
-        <>
+        <Stack paddingBottom={4}>
+          <Stack width="100%" maxWidth="md" justifyContent="flex-end" mb={1}>
+            <Typography textAlign={'right'} color="text.secondary" variant="body2">
+              Sist oppdatert: {updated ? new Date(updated).toLocaleDateString('no-NO') : 'N/A'}
+            </Typography>
+          </Stack>
+
           <Stack maxWidth="md" width="100%" alignItems="center" mb={2}>
             <Accordion sx={{ width: '100%', maxWidth: 'md' }}>
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -118,20 +126,19 @@ export const HomePage = () => {
               </AccordionDetails>
             </Accordion>
           </Stack>
-        </>
+          <Stack alignItems="center">
+            <Button
+              component={RouterLink}
+              to={paths.BUDGET_SIMULATOR}
+              variant="contained"
+              color="primary"
+              size="medium"
+            >
+              Lag ditt statsbudsjett
+            </Button>
+          </Stack>
+        </Stack>
       )}
-
-      <Stack alignItems="center">
-        <Button
-          component={RouterLink}
-          to={paths.BUDGET_SIMULATOR}
-          variant="contained"
-          color="primary"
-          size="medium"
-        >
-          Lag ditt statsbudsjett
-        </Button>
-      </Stack>
     </Stack>
   );
 };

@@ -30,7 +30,7 @@ import { useBudgetContext } from '../context/BudgetContext';
 import { useEffect, useState } from 'react';
 
 export const BudgetSimulatorPage = () => {
-  const { data, loading, error } = useBudgetContext();
+  const { data, loading, error, updated } = useBudgetContext();
   const [localData, setLocalData] = useState<typeof data | null>(null);
   const [newInntekt, setNewInntekt] = useState({ label: '', value: 0 });
   const [newUtgift, setNewUtgift] = useState({ label: '', value: 0 });
@@ -150,6 +150,11 @@ export const BudgetSimulatorPage = () => {
 
         {!loading && localData && (
           <>
+            <Stack width="100%" maxWidth="md" justifyContent="flex-end" mb={1}>
+              <Typography textAlign={'right'} color="text.secondary" variant="body2">
+                Sist oppdatert: {updated ? new Date(updated).toLocaleDateString('no-NO') : 'N/A'}
+              </Typography>
+            </Stack>
             <Stack maxWidth="md" width="100%" alignItems="center" mb={2}>
               <Accordion sx={{ width: '100%', maxWidth: 'md' }}>
                 <AccordionSummary expandIcon={<ExpandMoreIcon />}>

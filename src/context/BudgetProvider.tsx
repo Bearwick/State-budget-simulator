@@ -7,6 +7,7 @@ export const BudgetProvider = ({ children }: { children: ReactNode }) => {
   const [data, setData] = useState<BudgetItem[] | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean | Error>(false);
+  const [updated, setUpdated] = useState<string | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -22,6 +23,7 @@ export const BudgetProvider = ({ children }: { children: ReactNode }) => {
           value: values[i],
         }));
         setData(items);
+        setUpdated(res.updated);
       } catch (err) {
         setError(err as Error);
         setData(null);
@@ -34,7 +36,9 @@ export const BudgetProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   return (
-    <BudgetContext.Provider value={{ data, setData, loading, setLoading, error, setError }}>
+    <BudgetContext.Provider
+      value={{ data, setData, loading, setLoading, error, setError, updated, setUpdated }}
+    >
       {children}
     </BudgetContext.Provider>
   );

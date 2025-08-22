@@ -8,6 +8,8 @@ export interface BudgetContextType {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   error: boolean | Error;
   setError: React.Dispatch<React.SetStateAction<boolean | Error>>;
+  updated: string | null;
+  setUpdated: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 export const BudgetContext = createContext<BudgetContextType | undefined>(undefined);
