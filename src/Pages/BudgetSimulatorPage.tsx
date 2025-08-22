@@ -140,7 +140,7 @@ export const BudgetSimulatorPage = () => {
           side på grunn av enkelte poster. Hvis du oppdager feil, vet hvilke poster som skal
           eksluderes fra summeringen, eller vil hjelpe til med å forbedre simulatoren, legg til et
           issue på{' '}
-          <Link href="https://github.com/YOUR_GITHUB_REPO" target="_blank" rel="noopener">
+          <Link href="https://github.com/Bearwick" target="_blank" rel="noopener noreferrer">
             Github
           </Link>
           .
