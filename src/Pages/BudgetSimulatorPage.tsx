@@ -52,6 +52,26 @@ export const BudgetSimulatorPage = () => {
     localData?.filter((item) => !item.code.startsWith('INNT') && !item.code.startsWith('UTG')) ||
     [];
 
+  const computeTotal = (rows: typeof data | null | undefined, totalCode: string) => {
+    return (rows ?? []).filter((i) => i.code !== totalCode).reduce((sum, i) => sum + i.value, 0);
+  };
+
+  const totalInntekterMillioner = computeTotal(inntekter, 'INNT.IALT');
+  const totalUtgifterMillioner = computeTotal(utgifter, 'UTG.IALT');
+  const differenceMrd = (totalInntekterMillioner - totalUtgifterMillioner) / 1000;
+
+  const cMillioner = localData?.find((i) => i.code === 'OF_PETROL_FOND')?.value ?? 0;
+  const cMrd = cMillioner / 1000;
+
+  const formattedDifference = differenceMrd.toLocaleString('no-NO', {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  });
+  const formattedC = cMrd.toLocaleString('no-NO', {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  });
+
   return (
     <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', mt: 2 }}>
       <Stack spacing={2} sx={{ p: 2 }} alignItems="center">
@@ -94,15 +114,9 @@ export const BudgetSimulatorPage = () => {
                               </TableCell>
                               <TableCell align="right">
                                 {isTotal ? (
-                                  <Typography
-                                    fontWeight="bold"
-                                    variant="subtitle1"
-                                    paddingRight={1.75}
-                                  >
-                                    {Math.round(
-                                      inntekter
-                                        .filter((i) => i.code !== 'INNT.IALT')
-                                        .reduce((sum, i) => sum + i.value, 0) * 1_000_000
+                                  <Typography fontWeight="bold" variant="subtitle1">
+                                    {(
+                                      computeTotal(inntekter, 'INNT.IALT') * 1_000_000
                                     ).toLocaleString('no-NO')}{' '}
                                     kr
                                   </Typography>
@@ -160,15 +174,9 @@ export const BudgetSimulatorPage = () => {
                               </TableCell>
                               <TableCell align="right">
                                 {isTotal ? (
-                                  <Typography
-                                    fontWeight="bold"
-                                    variant="subtitle1"
-                                    paddingRight={1.75}
-                                  >
-                                    {Math.round(
-                                      utgifter
-                                        .filter((i) => i.code !== 'UTG.IALT')
-                                        .reduce((sum, i) => sum + i.value, 0) * 1_000_000
+                                  <Typography fontWeight="bold" variant="subtitle1">
+                                    {(
+                                      computeTotal(utgifter, 'UTG.IALT') * 1_000_000
                                     ).toLocaleString('no-NO')}{' '}
                                     kr
                                   </Typography>
@@ -208,6 +216,15 @@ export const BudgetSimulatorPage = () => {
                   <Typography>Balanse og finansiering</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
+                  <Typography textAlign={'left'}>
+                    <strong>Merk:</strong> Differansen mellom inntekter (A) og utgifter (B) er
+                    <strong> {formattedDifference} mrd. kr</strong>, men budsjettsaldoen (C) er
+                    <strong> {formattedC} mrd. kr</strong>.
+                  </Typography>
+                  <Typography textAlign={'left'} paddingBottom={2}>
+                    Årsaken er at enkelte poster (bl.a. petroleumsinntekter og utlån) føres
+                    særskilt, og ikke inngår i A og B.
+                  </Typography>
                   <TableContainer component={Paper}>
                     <Table size="small">
                       <TableBody>
