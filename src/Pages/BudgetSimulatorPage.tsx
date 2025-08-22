@@ -24,10 +24,12 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import Paper from '@mui/material/Paper';
 import InputAdornment from '@mui/material/InputAdornment';
-import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import { useBudgetContext } from '../context/BudgetContext';
 import { useEffect, useState } from 'react';
+import Link from '@mui/material/Link';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 export const BudgetSimulatorPage = () => {
   const { data, loading, error, updated } = useBudgetContext();
@@ -35,6 +37,8 @@ export const BudgetSimulatorPage = () => {
   const [newInntekt, setNewInntekt] = useState({ label: '', value: 0 });
   const [newUtgift, setNewUtgift] = useState({ label: '', value: 0 });
   const [newUtgiftError, setNewUtgiftError] = useState('');
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   useEffect(() => {
     const storedData = localStorage.getItem('budgetSimulatorData');
@@ -122,8 +126,8 @@ export const BudgetSimulatorPage = () => {
   });
 
   return (
-    <Box sx={{ width: '100%', display: 'flex', justifyContent: 'center', mt: 2 }}>
-      <Stack spacing={2} sx={{ p: 2 }} alignItems="center">
+    <Stack spacing={6} sx={{ p: 2 }} alignItems="center">
+      <Stack>
         <Typography variant="h4" gutterBottom align="center">
           Lag ditt alternative statsbudsjett
         </Typography>
@@ -136,9 +140,9 @@ export const BudgetSimulatorPage = () => {
           side på grunn av enkelte poster. Hvis du oppdager feil, vet hvilke poster som skal
           eksluderes fra summeringen, eller vil hjelpe til med å forbedre simulatoren, legg til et
           issue på{' '}
-          <a href="https://github.com/YOUR_GITHUB_REPO" target="_blank" rel="noopener noreferrer">
+          <Link href="https://github.com/YOUR_GITHUB_REPO" target="_blank" rel="noopener">
             Github
-          </a>
+          </Link>
           .
         </Typography>
 
@@ -147,22 +151,92 @@ export const BudgetSimulatorPage = () => {
             En feil har oppstått: kunne ikke hente statsbudsjettet
           </Typography>
         )}
+      </Stack>
 
-        {!loading && localData && (
-          <>
-            <Stack width="100%" maxWidth="md" justifyContent="flex-end" mb={1}>
-              <Typography textAlign={'right'} color="text.secondary" variant="body2">
-                Sist oppdatert: {updated ? new Date(updated).toLocaleDateString('no-NO') : 'N/A'}
-              </Typography>
-            </Stack>
-            <Stack maxWidth="md" width="100%" alignItems="center" mb={2}>
-              <Accordion sx={{ width: '100%', maxWidth: 'md' }}>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography>Inntekter</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
+      {!loading && localData && (
+        <Stack paddingBottom={4}>
+          <Stack width="100%" maxWidth="md" justifyContent="flex-end" mb={1}>
+            <Typography textAlign={'right'} color="text.secondary" variant="body2">
+              Sist oppdatert: {updated ? new Date(updated).toLocaleDateString('no-NO') : 'N/A'}
+            </Typography>
+          </Stack>
+          <Stack maxWidth="md" width="100%" alignItems="center" mb={2}>
+            <Accordion sx={{ width: '100%', maxWidth: 'md' }}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography>Inntekter</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                {isMobile ? (
+                  <Stack>
+                    {inntekter.map((item) => {
+                      const isTotal = item.code === 'INNT.IALT';
+                      return (
+                        <Paper key={item.code} sx={{ p: 1, mb: 1, width: '100%' }}>
+                          <Typography variant="subtitle2">{item.label}</Typography>
+                          {isTotal ? (
+                            <Typography fontWeight="bold">
+                              {computeTotal(inntekter, 'INNT.IALT').toLocaleString('no-NO')} kr
+                            </Typography>
+                          ) : (
+                            <Stack
+                              direction="row"
+                              spacing={1}
+                              alignItems="center"
+                              justifyContent="center"
+                            >
+                              {item.code.startsWith('INNT.NEW_') && (
+                                <Button
+                                  variant="outlined"
+                                  color="error"
+                                  size="small"
+                                  onClick={() => {
+                                    if (!localData) return;
+                                    const updatedData = localData.filter(
+                                      (i) => i.code !== item.code
+                                    );
+                                    setLocalData(updatedData);
+                                    localStorage.setItem(
+                                      'budgetSimulatorData',
+                                      JSON.stringify(updatedData)
+                                    );
+                                  }}
+                                >
+                                  Slett
+                                </Button>
+                              )}
+                              <TextField
+                                type="number"
+                                value={
+                                  item.code.startsWith('INNT.NEW_')
+                                    ? item.value
+                                    : Math.round(item.value * 1_000_000)
+                                }
+                                onChange={(e) =>
+                                  handleValueChange(
+                                    item.code,
+                                    item.code.startsWith('INNT.NEW_')
+                                      ? Number(e.target.value)
+                                      : Number(e.target.value) / 1_000_000
+                                  )
+                                }
+                                size="small"
+                                slotProps={{
+                                  input: {
+                                    endAdornment: (
+                                      <InputAdornment position="end">kr</InputAdornment>
+                                    ),
+                                  },
+                                }}
+                              />
+                            </Stack>
+                          )}
+                        </Paper>
+                      );
+                    })}
+                  </Stack>
+                ) : (
                   <TableContainer component={Paper}>
-                    <Table size="small">
+                    <Table>
                       <TableBody>
                         {inntekter.map((item) => {
                           const isTotal = item.code === 'INNT.IALT';
@@ -188,7 +262,7 @@ export const BudgetSimulatorPage = () => {
                                     direction="row"
                                     spacing={1}
                                     alignItems="center"
-                                    justifyContent="flex-end"
+                                    justifyContent="center"
                                   >
                                     {item.code.startsWith('INNT.NEW_') && (
                                       <Button
@@ -243,42 +317,109 @@ export const BudgetSimulatorPage = () => {
                       </TableBody>
                     </Table>
                   </TableContainer>
-                  <Stack direction="row" spacing={1} mt={1}>
-                    <TextField
-                      size="small"
-                      placeholder="Ny inntekt"
-                      value={newInntekt.label}
-                      onChange={(e) => setNewInntekt({ ...newInntekt, label: e.target.value })}
-                    />
-                    <TextField
-                      size="small"
-                      type="number"
-                      placeholder="Verdi"
-                      value={newInntekt.value}
-                      onChange={(e) =>
-                        setNewInntekt({ ...newInntekt, value: Number(e.target.value) })
-                      }
-                      slotProps={{
-                        input: {
-                          endAdornment: <InputAdornment position="end">kr</InputAdornment>,
-                        },
-                      }}
-                    />
-                    <Button variant="contained" size="small" onClick={addNewInntekt}>
-                      Legg til
-                    </Button>
+                )}
+                <Stack direction="row" spacing={1} mt={1} flexWrap="wrap" useFlexGap>
+                  <TextField
+                    size="small"
+                    placeholder="Ny inntekt"
+                    value={newInntekt.label}
+                    onChange={(e) => setNewInntekt({ ...newInntekt, label: e.target.value })}
+                  />
+                  <TextField
+                    size="small"
+                    type="number"
+                    placeholder="Verdi"
+                    value={newInntekt.value}
+                    onChange={(e) =>
+                      setNewInntekt({ ...newInntekt, value: Number(e.target.value) })
+                    }
+                    slotProps={{
+                      input: {
+                        endAdornment: <InputAdornment position="end">kr</InputAdornment>,
+                      },
+                    }}
+                  />
+                  <Button variant="contained" size="small" onClick={addNewInntekt}>
+                    Legg til
+                  </Button>
+                </Stack>
+              </AccordionDetails>
+            </Accordion>
+          </Stack>
+          <Stack maxWidth="md" width="100%" alignItems="center" mb={2}>
+            <Accordion sx={{ width: '100%', maxWidth: 'md' }}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography>Utgifter</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                {isMobile ? (
+                  <Stack>
+                    {utgifter.map((item) => {
+                      const isTotal = item.code === 'UTG.IALT';
+                      const isNewRow = item.code.startsWith('UTG.NEW_');
+                      return (
+                        <Paper key={item.code} sx={{ p: 1, mb: 1, width: '100%' }}>
+                          <Typography variant="subtitle2">{item.label}</Typography>
+                          {isTotal ? (
+                            <Typography fontWeight="bold">
+                              {computeTotal(utgifter, 'UTG.IALT').toLocaleString('no-NO')} kr
+                            </Typography>
+                          ) : (
+                            <Stack
+                              direction="row"
+                              spacing={1}
+                              alignItems="center"
+                              justifyContent="center"
+                            >
+                              {isNewRow && (
+                                <Button
+                                  variant="outlined"
+                                  color="error"
+                                  size="small"
+                                  onClick={() => {
+                                    if (!localData) return;
+                                    const updatedData = localData.filter(
+                                      (i) => i.code !== item.code
+                                    );
+                                    setLocalData(updatedData);
+                                    localStorage.setItem(
+                                      'budgetSimulatorData',
+                                      JSON.stringify(updatedData)
+                                    );
+                                  }}
+                                >
+                                  Slett
+                                </Button>
+                              )}
+                              <TextField
+                                type="number"
+                                value={isNewRow ? item.value : Math.round(item.value * 1_000_000)}
+                                onChange={(e) =>
+                                  handleValueChange(
+                                    item.code,
+                                    isNewRow
+                                      ? Number(e.target.value)
+                                      : Number(e.target.value) / 1_000_000
+                                  )
+                                }
+                                size="small"
+                                slotProps={{
+                                  input: {
+                                    endAdornment: (
+                                      <InputAdornment position="end">kr</InputAdornment>
+                                    ),
+                                  },
+                                }}
+                              />
+                            </Stack>
+                          )}
+                        </Paper>
+                      );
+                    })}
                   </Stack>
-                </AccordionDetails>
-              </Accordion>
-            </Stack>
-            <Stack maxWidth="md" width="100%" alignItems="center" mb={2}>
-              <Accordion sx={{ width: '100%', maxWidth: 'md' }}>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography>Utgifter</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
+                ) : (
                   <TableContainer component={Paper}>
-                    <Table size="small">
+                    <Table>
                       <TableBody>
                         {utgifter.map((item) => {
                           const isTotal = item.code === 'UTG.IALT';
@@ -357,72 +498,112 @@ export const BudgetSimulatorPage = () => {
                       </TableBody>
                     </Table>
                   </TableContainer>
-                  <Stack direction="row" spacing={1} mt={1}>
-                    <TextField
-                      size="small"
-                      placeholder="Ny utgift"
-                      value={newUtgift.label}
-                      onChange={(e) => setNewUtgift({ ...newUtgift, label: e.target.value })}
-                      error={!!newUtgiftError}
-                      helperText={newUtgiftError}
-                    />
-                    <TextField
-                      size="small"
-                      type="number"
-                      placeholder="Verdi"
-                      value={newUtgift.value}
-                      onChange={(e) =>
-                        setNewUtgift({ ...newUtgift, value: Number(e.target.value) })
+                )}
+                <Stack direction="row" spacing={1} mt={1} flexWrap="wrap" useFlexGap>
+                  <TextField
+                    size="small"
+                    placeholder="Ny utgift"
+                    value={newUtgift.label}
+                    onChange={(e) => setNewUtgift({ ...newUtgift, label: e.target.value })}
+                    error={!!newUtgiftError}
+                    helperText={newUtgiftError}
+                  />
+                  <TextField
+                    size="small"
+                    type="number"
+                    placeholder="Verdi"
+                    value={newUtgift.value}
+                    onChange={(e) => setNewUtgift({ ...newUtgift, value: Number(e.target.value) })}
+                    slotProps={{
+                      input: {
+                        endAdornment: <InputAdornment position="end">kr</InputAdornment>,
+                      },
+                    }}
+                  />
+                  <Button variant="contained" size="small" onClick={addNewUtgift}>
+                    Legg til
+                  </Button>
+                </Stack>
+              </AccordionDetails>
+            </Accordion>
+          </Stack>
+          <Stack maxWidth="md" width="100%" alignItems="center" mb={2}>
+            <Accordion sx={{ width: '100%', maxWidth: 'md' }}>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography>Balanse og finansiering</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Typography textAlign={'left'}>
+                  <strong>Merk:</strong> Differansen mellom inntekter (A) og utgifter (B) er
+                  <strong> {formattedDifference} mrd. kr</strong>, men budsjettsaldoen (C) er
+                  <strong> {formattedC} mrd. kr</strong> (uten brukerendringer).
+                </Typography>
+                <Typography textAlign={'left'} paddingBottom={2}>
+                  Årsaken er at enkelte poster (bl.a. petroleumsinntekter og utlån) føres særskilt,
+                  og ikke inngår i A og B.
+                </Typography>
+                {isMobile ? (
+                  <Stack>
+                    {balanse.map((item) => {
+                      const isTotal = item.code === 'OFL' || item.code === 'FIN_BEHOV';
+                      const C = localData?.find((i) => i.code === 'OF_PETROL_FOND');
+                      const D = localData?.find((i) => i.code === 'PETROL_FOND');
+                      const F = localData?.find((i) => i.code === 'UTLAN');
+                      const G = localData?.find((i) => i.code === 'AVDRAG');
+                      const computedE = C && D ? C.value - D.value : null;
+                      let displayValue: number | null = null;
+                      if (item.code === 'OFL' && computedE !== null) {
+                        displayValue = computedE * 1_000_000;
+                      } else if (item.code === 'FIN_BEHOV' && F && G && computedE !== null) {
+                        displayValue = (F.value + G.value - computedE) * 1_000_000;
                       }
-                      slotProps={{
-                        input: {
-                          endAdornment: <InputAdornment position="end">kr</InputAdornment>,
-                        },
-                      }}
-                    />
-                    <Button variant="contained" size="small" onClick={addNewUtgift}>
-                      Legg til
-                    </Button>
+                      return (
+                        <Paper key={item.code} sx={{ p: 1, mb: 1, width: '100%' }}>
+                          <Typography variant="subtitle2">{item.label}</Typography>
+                          {isTotal ? (
+                            <Typography fontWeight="bold">
+                              {(displayValue !== null
+                                ? Math.round(displayValue)
+                                : Math.round(item.value * 1_000_000)
+                              ).toLocaleString('no-NO')}{' '}
+                              kr
+                            </Typography>
+                          ) : (
+                            <TextField
+                              type="number"
+                              value={Math.round(item.value * 1_000_000)}
+                              onChange={(e) =>
+                                handleValueChange(item.code, Number(e.target.value) / 1_000_000)
+                              }
+                              size="small"
+                              slotProps={{
+                                input: {
+                                  endAdornment: <InputAdornment position="end">kr</InputAdornment>,
+                                },
+                              }}
+                            />
+                          )}
+                        </Paper>
+                      );
+                    })}
                   </Stack>
-                </AccordionDetails>
-              </Accordion>
-            </Stack>
-            <Stack maxWidth="md" width="100%" alignItems="center" mb={2}>
-              <Accordion sx={{ width: '100%', maxWidth: 'md' }}>
-                <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                  <Typography>Balanse og finansiering</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Typography textAlign={'left'}>
-                    <strong>Merk:</strong> Differansen mellom inntekter (A) og utgifter (B) er
-                    <strong> {formattedDifference} mrd. kr</strong>, men budsjettsaldoen (C) er
-                    <strong> {formattedC} mrd. kr</strong> (uten brukerendringer).
-                  </Typography>
-                  <Typography textAlign={'left'} paddingBottom={2}>
-                    Årsaken er at enkelte poster (bl.a. petroleumsinntekter og utlån) føres
-                    særskilt, og ikke inngår i A og B.
-                  </Typography>
+                ) : (
                   <TableContainer component={Paper}>
-                    <Table size="small">
+                    <Table>
                       <TableBody>
                         {balanse.map((item) => {
                           const isTotal = item.code === 'OFL' || item.code === 'FIN_BEHOV';
-
                           const C = localData?.find((i) => i.code === 'OF_PETROL_FOND');
                           const D = localData?.find((i) => i.code === 'PETROL_FOND');
                           const F = localData?.find((i) => i.code === 'UTLAN');
                           const G = localData?.find((i) => i.code === 'AVDRAG');
-
                           const computedE = C && D ? C.value - D.value : null;
-
                           let displayValue: number | null = null;
-
                           if (item.code === 'OFL' && computedE !== null) {
                             displayValue = computedE * 1_000_000;
                           } else if (item.code === 'FIN_BEHOV' && F && G && computedE !== null) {
                             displayValue = (F.value + G.value - computedE) * 1_000_000;
                           }
-
                           return (
                             <TableRow key={item.code}>
                               <TableCell>
@@ -464,60 +645,60 @@ export const BudgetSimulatorPage = () => {
                       </TableBody>
                     </Table>
                   </TableContainer>
-                </AccordionDetails>
-              </Accordion>
-            </Stack>
-            <Stack
-              mt={2}
-              width="100%"
-              display={'flex'}
-              flexDirection={'row'}
-              justifyContent="flex-end"
+                )}
+              </AccordionDetails>
+            </Accordion>
+          </Stack>
+          <Stack
+            mt={2}
+            width="100%"
+            display={'flex'}
+            flexDirection={'row'}
+            justifyContent="flex-end"
+          >
+            <Button
+              sx={{ width: '10rem' }}
+              variant="contained"
+              color="secondary"
+              onClick={resetToFetchedData}
             >
-              <Button
-                sx={{ width: '10rem' }}
-                variant="contained"
-                color="secondary"
-                onClick={resetToFetchedData}
-              >
-                Start på nytt
-              </Button>
-            </Stack>
-            <Stack direction="row" spacing={2} mt={2} alignItems="center">
-              <FacebookShareButton url={window.location.href}>
-                <FacebookIcon size={32} round />
-              </FacebookShareButton>
-              <FacebookMessengerShareButton
-                url={window.location.href}
-                appId="521270401588372" //finne selv
-                title={`Se mitt alternative statsbudsjett`}
-              >
-                <FacebookMessengerIcon size={32} round />
-              </FacebookMessengerShareButton>
-              <TwitterShareButton
-                url={window.location.href}
-                title={`Se mitt alternative statsbudsjett: Inntekter: ${totalInntekterMillioner.toLocaleString('no-NO')} kr, Utgifter: ${totalUtgifterMillioner.toLocaleString('no-NO')} kr.`}
-              >
-                <TwitterIcon size={32} round />
-              </TwitterShareButton>
-              <LinkedinShareButton
-                url={window.location.href}
-                title={`Mitt alternative statsbudsjett`}
-                summary={`Inntekter: ${totalInntekterMillioner.toLocaleString('no-NO')} kr, Utgifter: ${totalUtgifterMillioner.toLocaleString('no-NO')} kr.`}
-              >
-                <LinkedinIcon size={32} round />
-              </LinkedinShareButton>
-              <EmailShareButton
-                url={window.location.href}
-                subject="Mitt alternative statsbudsjett"
-                body={`Se mitt alternative statsbudsjett: Inntekter: ${totalInntekterMillioner.toLocaleString('no-NO')} kr, Utgifter: ${totalUtgifterMillioner.toLocaleString('no-NO')} kr.`}
-              >
-                <EmailIcon size={32} round />
-              </EmailShareButton>
-            </Stack>
-          </>
-        )}
-      </Stack>
-    </Box>
+              Start på nytt
+            </Button>
+          </Stack>
+          <Stack direction="row" spacing={2} mt={2} alignItems="center" justifyContent="center">
+            <FacebookShareButton url={window.location.href}>
+              <FacebookIcon size={32} round />
+            </FacebookShareButton>
+            <FacebookMessengerShareButton
+              url={window.location.href}
+              appId="521270401588372" //finne selv
+              title={`Se mitt alternative statsbudsjett`}
+            >
+              <FacebookMessengerIcon size={32} round />
+            </FacebookMessengerShareButton>
+            <TwitterShareButton
+              url={window.location.href}
+              title={`Se mitt alternative statsbudsjett: Inntekter: ${totalInntekterMillioner.toLocaleString('no-NO')} kr, Utgifter: ${totalUtgifterMillioner.toLocaleString('no-NO')} kr.`}
+            >
+              <TwitterIcon size={32} round />
+            </TwitterShareButton>
+            <LinkedinShareButton
+              url={window.location.href}
+              title={`Mitt alternative statsbudsjett`}
+              summary={`Inntekter: ${totalInntekterMillioner.toLocaleString('no-NO')} kr, Utgifter: ${totalUtgifterMillioner.toLocaleString('no-NO')} kr.`}
+            >
+              <LinkedinIcon size={32} round />
+            </LinkedinShareButton>
+            <EmailShareButton
+              url={window.location.href}
+              subject="Mitt alternative statsbudsjett"
+              body={`Se mitt alternative statsbudsjett: Inntekter: ${totalInntekterMillioner.toLocaleString('no-NO')} kr, Utgifter: ${totalUtgifterMillioner.toLocaleString('no-NO')} kr.`}
+            >
+              <EmailIcon size={32} round />
+            </EmailShareButton>
+          </Stack>
+        </Stack>
+      )}
+    </Stack>
   );
 };
