@@ -1,3 +1,6 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/" }]
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/" },
+    { "source": "/ssb-api/:path*", "destination": "https://api.ssb.no/:path*" }
+  ]
 }
