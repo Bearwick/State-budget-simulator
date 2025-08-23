@@ -6,29 +6,9 @@ export async function fetchBudgetData() {
     if (!res.ok) throw new Error("Failed to fetch budget data");
     return json;
   } catch {
-  const urlPost = "/ssb-api/api/v0/no/table/10487";
-    const body = {
-  "query": [
-    {
-      "code": "Tid",
-      "selection": {
-        "filter": "item",
-        "values": [
-          "2025"
-        ]
-      }
-    }
-  ],
-  "response": {
-    "format": "json-stat2"
-  }
-
-    };
-    const resFallback = await fetch(urlPost, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
-    });
+    const resFallback = await fetch("/api/fetchBudget", {
+  method: "POST"
+});
     if (!resFallback.ok) throw new Error("Failed to fetch budget data with fallback");
     return resFallback.json();
   }
