@@ -35,7 +35,7 @@ export const HomePage = () => {
           Regjeringens statsbudsjett
         </Typography>
         <Typography variant="body1" align="center">
-          Dette viser dagens regjeringens statsbudsjett hentet fra{' '}
+          Dette viser regjeringen sitt statsbudsjett, hentet fra{' '}
           <Link href="https://www.ssb.no/statbank/table/10487" target="_blank" rel="noopener">
             Statistisk sentralbyrå (SSB)
           </Link>
