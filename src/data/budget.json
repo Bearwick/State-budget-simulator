@@ -1,0 +1,197 @@
+{
+  "version": "2.0",
+  "class": "dataset",
+  "label": "10487: Inntekter og utgifter i statsbudsjettet (mill. kr), etter hovedpost, statistikkvariabel og år",
+  "source": "Statistisk sentralbyrå",
+  "updated": "2025-03-11T07:00:00Z",
+  "role": { "time": ["Tid"], "metric": ["ContentsCode"] },
+  "id": ["Hovedpost", "ContentsCode", "Tid"],
+  "size": [37, 1, 1],
+  "dimension": {
+    "Hovedpost": {
+      "label": "hovedpost",
+      "category": {
+        "index": {
+          "INNT.IALT": 0,
+          "INNT.SALG": 1,
+          "INNT.DR_RES_PETROL": 2,
+          "INNT.AVSKR_PETROL": 3,
+          "INNT.AVSKR_FORRETN": 4,
+          "INNT.ANDRE_BYGG": 5,
+          "INNT.OVERF_IALT": 6,
+          "INNT.SKATT_AVG": 7,
+          "INNT.MEDL_PR": 8,
+          "INNT.ARB_G_AVG": 9,
+          "INNT.RENTER_UTB": 10,
+          "INNT.ANDRE_STATL": 11,
+          "INNT.KOMM_FYLK": 12,
+          "INNT.NORGES_BANK": 13,
+          "INNT.ANDRE_OVERF": 14,
+          "UTG.IALT": 15,
+          "UTG.DRIFT_IALT": 16,
+          "UTG.LONN": 17,
+          "UTG.VARER_TJ": 18,
+          "UTG.ANDRE_DRIFT": 19,
+          "UTG.DR_RES_FORRETN": 20,
+          "UTG.BYGG_IALT": 21,
+          "UTG.BYGG_PETROL": 22,
+          "UTG.BYGG_FORRETN": 23,
+          "UTG.BYGG_ELLERS": 24,
+          "UTG.OVERF_IALT": 25,
+          "UTG.ANDRE_STATL": 26,
+          "UTG.KOMM_FYLK": 27,
+          "UTG.PENSJ_TRYGD": 28,
+          "UTG.RENTER": 29,
+          "UTG.ANDRE_OVERF": 30,
+          "OF_PETROL_FOND": 31,
+          "PETROL_FOND": 32,
+          "OFL": 33,
+          "UTLAN": 34,
+          "AVDRAG": 35,
+          "FIN_BEHOV": 36
+        },
+        "label": {
+          "INNT.IALT": "A. INNTEKTER I ALT",
+          "INNT.SALG": "Salg av varer og tjenester",
+          "INNT.DR_RES_PETROL": "Driftsresultat i statens petroleumsvirksomhet",
+          "INNT.AVSKR_PETROL": "Avskrivninger og inntekter av statens petroleumsvirksomhet",
+          "INNT.AVSKR_FORRETN": "Avskrivninger og inntekter av statens forretningsdrift ellers",
+          "INNT.ANDRE_BYGG": "Andre inntekter i samband med bygg og anlegg",
+          "INNT.OVERF_IALT": "Overføringer i alt",
+          "INNT.SKATT_AVG": "  Skatter og avgifter",
+          "INNT.MEDL_PR": "  Medlemspremier til folketrygden",
+          "INNT.ARB_G_AVG": "  Arbeidsgiveravgift til folketrygden",
+          "INNT.RENTER_UTB": "  Renter og utbytte",
+          "INNT.ANDRE_STATL": "  Overføringer fra andre statlige regnskaper",
+          "INNT.KOMM_FYLK": "  Overføringer fra kommuner og fylkeskommuner",
+          "INNT.NORGES_BANK": "  Overføringer fra Norges bank",
+          "INNT.ANDRE_OVERF": "  Andre overføringer",
+          "UTG.IALT": "B. UTGIFTER I ALT",
+          "UTG.DRIFT_IALT": "Statens egne driftsutgifter i alt",
+          "UTG.LONN": "  Lønn og godtgjørelser",
+          "UTG.VARER_TJ": "  Varer og tjenester",
+          "UTG.ANDRE_DRIFT": "  Andre driftsutgifter",
+          "UTG.DR_RES_FORRETN": "  Driftsresultat i statens forretningsdrift",
+          "UTG.BYGG_IALT": "Nybygg, anlegg mv i alt",
+          "UTG.BYGG_PETROL": "  Nybygg mv statens petroleumsvirksomhet",
+          "UTG.BYGG_FORRETN": "  Nybygg mv statens forretningsdrift ellers",
+          "UTG.BYGG_ELLERS": "  Nybygg, anlegg mv ellers",
+          "UTG.OVERF_IALT": "Overføringer i alt",
+          "UTG.ANDRE_STATL": "  Overføringer til andre statlige regnskaper",
+          "UTG.KOMM_FYLK": "  Overføringer til kommuner og fylkeskommuner",
+          "UTG.PENSJ_TRYGD": "  Pensjoner, trygder mv, folketrygden",
+          "UTG.RENTER": "  Renteutgifter vedr. statsgjelden",
+          "UTG.ANDRE_OVERF": "  Andre overføringer",
+          "OF_PETROL_FOND": "C. OVERSKUDD FØR NETTO AVSETNING TIL STATENS PENSJONSFOND - UTLAND",
+          "PETROL_FOND": "D. NETTO AVSETNING TIL STATENS PENSJONSFOND - UTLAND",
+          "OFL": "E=C-D. OVERSKUDD FØR LÅNETRANSAKSJONER",
+          "UTLAN": "F. NETTO UTLÅN MV",
+          "AVDRAG": "G. AVDRAG PÅ STATSGJELDEN",
+          "FIN_BEHOV": "H=F+G-E. FINANSIERINGSBEHOV"
+        }
+      },
+      "extension": { "elimination": false, "show": "value" },
+      "link": {
+        "describedby": [
+          {
+            "extension": {
+              "INNT.SALG": "urn:ssb:conceptvariable:vardok:1514",
+              "INNT.DR_RES_PETROL": "urn:ssb:conceptvariable:vardok:1515",
+              "INNT.AVSKR_PETROL": "urn:ssb:conceptvariable:vardok:1516",
+              "INNT.AVSKR_FORRETN": "urn:ssb:conceptvariable:vardok:1517",
+              "INNT.ANDRE_BYGG": "urn:ssb:conceptvariable:vardok:1518",
+              "INNT.OVERF_IALT": "urn:ssb:conceptvariable:vardok:1519",
+              "INNT.SKATT_AVG": "urn:ssb:conceptvariable:vardok:1520",
+              "INNT.MEDL_PR": "urn:ssb:conceptvariable:vardok:1521",
+              "INNT.ARB_G_AVG": "urn:ssb:conceptvariable:vardok:1522",
+              "INNT.RENTER_UTB": "urn:ssb:conceptvariable:vardok:1523",
+              "INNT.ANDRE_STATL": "urn:ssb:conceptvariable:vardok:1524",
+              "INNT.KOMM_FYLK": "urn:ssb:conceptvariable:vardok:1525",
+              "UTG.DRIFT_IALT": "urn:ssb:conceptvariable:vardok:1526",
+              "UTG.LONN": "urn:ssb:conceptvariable:vardok:1527",
+              "UTG.VARER_TJ": "urn:ssb:conceptvariable:vardok:1528",
+              "UTG.ANDRE_DRIFT": "urn:ssb:conceptvariable:vardok:1529",
+              "UTG.DR_RES_FORRETN": "urn:ssb:conceptvariable:vardok:1530",
+              "UTG.BYGG_IALT": "urn:ssb:conceptvariable:vardok:1531",
+              "UTG.BYGG_PETROL": "urn:ssb:conceptvariable:vardok:1532",
+              "UTG.OVERF_IALT": "urn:ssb:conceptvariable:vardok:1519",
+              "UTG.ANDRE_STATL": "urn:ssb:conceptvariable:vardok:1534",
+              "UTG.KOMM_FYLK": "urn:ssb:conceptvariable:vardok:1535",
+              "UTG.PENSJ_TRYGD": "urn:ssb:conceptvariable:vardok:1536",
+              "UTG.RENTER": "urn:ssb:conceptvariable:vardok:1538",
+              "UTG.ANDRE_OVERF": "urn:ssb:conceptvariable:vardok:1539"
+            }
+          }
+        ]
+      }
+    },
+    "ContentsCode": {
+      "label": "statistikkvariabel",
+      "category": {
+        "index": { "Belop": 0 },
+        "label": { "Belop": "Beløp" },
+        "unit": { "Belop": { "base": "mill. kr", "decimals": 0 } }
+      },
+      "extension": {
+        "elimination": false,
+        "refperiod": { "Belop": "31.12." },
+        "show": "value",
+        "measuringType": { "Belop": "Flow" },
+        "priceType": { "Belop": "NotApplicable" },
+        "adjustment": { "Belop": "None" }
+      }
+    },
+    "Tid": {
+      "label": "år",
+      "category": { "index": { "2025": 0 }, "label": { "2025": "2025" } },
+      "extension": { "elimination": false, "show": "code" }
+    }
+  },
+  "extension": {
+    "px": {
+      "infofile": "None",
+      "tableid": "10487",
+      "decimals": 0,
+      "official-statistics": true,
+      "aggregallowed": false,
+      "copyright": false,
+      "language": "no",
+      "contents": "10487: Inntekter og utgifter i statsbudsjettet (mill. kr),",
+      "descriptiondefault": false,
+      "heading": ["ContentsCode", "Tid"],
+      "stub": ["Hovedpost"],
+      "matrix": "Belop",
+      "subject-code": "os",
+      "subject-area": "Offentlig sektor"
+    },
+    "discontinued": null,
+    "contact": [
+      {
+        "name": "Kristian Bjerke-Kabahire",
+        "organization": "Statistisk sentralbyrå",
+        "phone": "91 68 64 96",
+        "mail": "bjk@ssb.no",
+        "raw": "Kristian Bjerke-Kabahire, Statistisk sentralbyrå# +47 91 68 64 96#bjk@ssb.no"
+      },
+      {
+        "name": "Bjørn Gran-Henriksen",
+        "organization": "Statistisk sentralbyrå",
+        "phone": "41 40 20 71",
+        "mail": "bge@ssb.no",
+        "raw": "Bjørn Gran-Henriksen, Statistisk sentralbyrå# +47 41 40 20 71#bge@ssb.no"
+      },
+      {
+        "name": "Frode Borgås",
+        "organization": "Statistisk sentralbyrå",
+        "phone": "409 02 652",
+        "mail": "fro@ssb.no",
+        "raw": "Frode Borgås, Statistisk sentralbyrå# +47 409 02 652#fro@ssb.no"
+      }
+    ]
+  },
+  "value": [
+    2249917, 28888, 218710, 32100, 1810, 2382, 1966027, 1345396, 197170, 269420, 121316, 1472, 2693,
+    18974, 9586, 2052803, 274939, 129144, 89696, 56378, -279, 103814, 29600, 8021, 66193, 1674050,
+    72867, 351411, 701563, 16426, 531783, 197114, 197115, -1, 112519, 63817, 176337
+  ]
+}
